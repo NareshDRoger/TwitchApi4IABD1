@@ -20,7 +20,7 @@ object VideoConvertor extends Converter[VideoIn, VideoOut]{
       //pagination: Object[String],
       published_at = new Timestamp(Integer.parseInt(input.published_at)),
       title = input.title,
-      type_ = input.type_,
+//      type_ = input.type_,
       //url : Object,
       user_id = input.user_id,
       user_login= input.user_login,
