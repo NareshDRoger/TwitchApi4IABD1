@@ -51,6 +51,22 @@ object ParserJson_BYUS extends App{
     println("VideoIn: " + m)
   }
 
+  val r = requests.post("https://id.twitch.tv/oauth2/token", data = Map("client_id" -> "29kho0bv7hn49vs4o0moum0f59om64","client_secret"->"5ga0hmwwjr20zgsqiiwqemaaa3dumc","grant_type"->"client_credentials"))
+  print(r.statusCode)
+  print(r.text)
+  val test = requests.get(
+    "https://api.twitch.tv/helix/search/categories?query=disc?&first=10",
+    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> "Bearer ruj1j6u2bjr87eiygrpwpgoc9jk7pl")
+  )
+  print(test.text)
+  val jsMultipleCategorieIn2 = test.text
 
-
+  // json is a JValue instance
+  val json3 = parse(jsMultipleCategorieIn2)
+  val elements3 = (json \\ "data").children
+  println(elements3.size + " CategorieIn :")
+  for (acct <- elements3) {
+    val m = acct.extract[CategorieIn]
+    println("CategorieIn: " + m)
+  }
 }
