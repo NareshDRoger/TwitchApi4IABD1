@@ -198,6 +198,7 @@ object ParserJson_BYUS extends App{
     val sOut = StreamConvertor.convert(sIn)
     println("\tVideo " + cpt3)
     println("\t\tTitre = " + sOut.title)
+    println("\t\tLien du stream = https://www.twitch.tv/" + sOut.user_name)
     println("\t\tA commencé le " + sOut.started_at.toLocalDate.format(dtf) + " à " + sOut.started_at.toLocalTime)
     println("\t\tPublié par = " + sOut.user_name)
     println("\t\tNombre de vues = " + sOut.view_count)
