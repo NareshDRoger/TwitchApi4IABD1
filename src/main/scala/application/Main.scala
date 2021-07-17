@@ -6,7 +6,7 @@ import utils.convertos.{StreamConvertor, VideoConvertor}
 
 import java.time.format.DateTimeFormatter
 
-object ParserJson_BYUS extends App{
+object Main extends App{
 
 
   implicit val formats = DefaultFormats
@@ -49,7 +49,7 @@ object ParserJson_BYUS extends App{
   val gameName = gameElement(gameSelect).extract[CategorieIn].name
   assert(gameId != null)
   assert(gameName != null)
-  println("Vous avez choisi le jeu : "+ gameName)
+  println("Vous avez choisi le jeu : " + gameName)
 //  println("gameId = " + gameId)
 
   print("Entrez le nombre de videos que vous souhaitez classer : ")
@@ -143,7 +143,7 @@ object ParserJson_BYUS extends App{
   }
 
   println("**************************************************")
-  println("CLASSEMENT DES STREAMS ACTIFS LES PLUS VUES D'UN JEU DONNE")
+  println("CLASSEMENT DES STREAMS ACTIFS LES PLUS VUS D'UN JEU DONNE")
 
   print("Entrez le jeu que vous souhaitez explorer : ")
   val gameNameSelect2 = scala.io.StdIn.readLine()
