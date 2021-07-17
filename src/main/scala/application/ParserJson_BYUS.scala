@@ -1,8 +1,8 @@
 package application
-import model.in.{CategorieIn, UserIn, VideoIn}
+import model.in.{CategorieIn, StreamIn, UserIn, VideoIn}
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
-import utils.convertos.VideoConvertor
+import utils.convertos.{StreamConvertor, VideoConvertor}
 
 import java.time.format.DateTimeFormatter
 
@@ -36,9 +36,11 @@ object ParserJson_BYUS extends App{
   val gameElement = (game \\ "data").children
   println(gameElement.size + " categories disponibles.")
   println("Voici la liste des catégories de 0 à " + (gameElement.size - 1))
+  var cptGame = 0
   for (acct <- gameElement) {
     val g = acct.extract[CategorieIn]
-    println("\t" + g.name)
+    println("\tJeu " + cptGame + " : " + g.name)
+    cptGame +=1
   }
 
   print("Entrez le numéro du jeu que vous souhaitez explorer : ")
@@ -48,7 +50,7 @@ object ParserJson_BYUS extends App{
   assert(gameId != null)
   assert(gameName != null)
   println("Vous avez choisi le jeu : "+ gameName)
-  println("gameId = " + gameId)
+//  println("gameId = " + gameId)
 
   print("Entrez le nombre de videos que vous souhaitez classer : ")
   val videosNumber = scala.io.StdIn.readInt()
@@ -75,13 +77,13 @@ object ParserJson_BYUS extends App{
     println("\t\tUrl = " + vOut.url)
     println("\t\tPublié le " + vOut.published_at.toLocalDate.format(dtf) + " à " + vOut.published_at.toLocalTime)
     println("\t\tPublié par = " + vOut.user_login)
-    println("\t\tNombre de vus = " + vOut.view_count)
+    println("\t\tNombre de vues = " + vOut.view_count)
     println("\t\tDurée = " + vOut.duration)
     cpt += 1
   }
 
-
-  println("CLASSEMENT DES VIDEOS LES PLUS VUES D'UN JEU DONNE")
+  println("**************************************************")
+  println("CLASSEMENT DES VIDEOS LES PLUS VUES D'UN UTILISATEUR DONNE")
 
     print("Entrez l'utilisateur que vous souhaitez explorer : ")
     val userNameSelect = scala.io.StdIn.readLine()
@@ -97,7 +99,7 @@ object ParserJson_BYUS extends App{
   val user = parse(userGetJson)
   val userElement = (user \\ "data").children
   println(userElement.size + " utilisateur(s) disponible(s).")
-  println("Voici la liste des utilisateurs de 0 à " + (userElement.size - 1))
+  println("Voici la liste des " + (userElement.size) +" utilisateur(s) trouvé(s) :")
   for (acct <- userElement) {
     val u = acct.extract[UserIn]
     println("\t" + u.login)
@@ -108,7 +110,7 @@ object ParserJson_BYUS extends App{
   assert(userId != null)
   assert(userDisplayName != null)
   println("Vous avez choisi l'utilisateur : " + userDisplayName)
-  println("userId = " + userId)
+//  println("userId = " + userId)
 
   print("Entrez le nombre de videos que vous souhaitez classer : ")
   val videosByUserNumber = scala.io.StdIn.readInt()
@@ -135,9 +137,72 @@ object ParserJson_BYUS extends App{
     println("\t\tUrl = " + vOut.url)
     println("\t\tPublié le " + vOut.published_at.toLocalDate.format(dtf) + " à " + vOut.published_at.toLocalTime)
     println("\t\tPublié par = " + vOut.user_login)
-    println("\t\tNombre de vus = " + vOut.view_count)
+    println("\t\tNombre de vues = " + vOut.view_count)
     println("\t\tDurée = " + vOut.duration)
     cpt2 += 1
+  }
+
+  println("**************************************************")
+  println("CLASSEMENT DES STREAMS ACTIFS LES PLUS VUES D'UN JEU DONNE")
+
+  print("Entrez le jeu que vous souhaitez explorer : ")
+  val gameNameSelect2 = scala.io.StdIn.readLine()
+
+  val gameGetRequest2 = requests.get(
+    "https://api.twitch.tv/helix/search/categories?query=" + gameNameSelect2,
+    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> ("Bearer " + bearer))
+  )
+  //  println(gameGetRequest2.text)
+  val gameGetJson2 = gameGetRequest2.text
+
+  // json is a JValue instance
+  val game2 = parse(gameGetJson2)
+  val gameElement2 = (game2 \\ "data").children
+  println(gameElement2.size + " categories disponibles.")
+  println("Voici la liste des catégories de 0 à " + (gameElement2.size - 1))
+  var cptGame2 = 0
+  for (acct <- gameElement2) {
+    val g = acct.extract[CategorieIn]
+    println("\tJeu " + cptGame2 + " : " + g.name)
+    cptGame2 += 1
+  }
+
+  print("Entrez le numéro du jeu que vous souhaitez explorer : ")
+  val gameSelect2 = scala.io.StdIn.readInt()
+  val gameId2 = gameElement2(gameSelect2).extract[CategorieIn].id
+  val gameName2 = gameElement2(gameSelect2).extract[CategorieIn].name
+  assert(gameId2 != null)
+  assert(gameName2 != null)
+  println("Vous avez choisi le jeu : "+ gameName2)
+//  println("gameId = " + gameId2)
+
+  print("Entrez le nombre de streams actifs que vous souhaitez classer : ")
+  val streamsNumber = scala.io.StdIn.readInt()
+
+  val streamsFromGameGetRequest = requests.get(
+    "https://api.twitch.tv/helix/streams?game_id=" + gameId2 + "&first=" + streamsNumber,
+    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> ("Bearer " + bearer))
+  )
+
+//  println(streamsFromGameGetRequest.text)
+  val streamsFromGameGetJson = streamsFromGameGetRequest.text
+  // json is a JValue instance
+  val streams = parse(streamsFromGameGetJson)
+  val streamsElements = (streams \\ "data").children
+  println(streamsElements.size + " streams.")
+  println("Voici les " + (streamsElements.size) + " streams actifs les plues vus du jeu " + gameName2)
+
+  var cpt3 = 1
+  for (acct <- streamsElements) {
+    val sIn = acct.extract[StreamIn]
+    val sOut = StreamConvertor.convert(sIn)
+    println("\tVideo " + cpt3)
+    println("\t\tTitre = " + sOut.title)
+    println("\t\tA commencé le " + sOut.started_at.toLocalDate.format(dtf) + " à " + sOut.started_at.toLocalTime)
+    println("\t\tPublié par = " + sOut.user_name)
+    println("\t\tNombre de vues = " + sOut.view_count)
+    println("\t\tLangue = " + sOut.language)
+    cpt3 += 1
   }
 
 }

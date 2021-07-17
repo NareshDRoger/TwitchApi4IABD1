@@ -1,9 +1,8 @@
 package model.out
 
-import java.sql.Timestamp
+import java.time.LocalDateTime
 
 case class UserOut (
-
                      broadcaster_type: String = null,
                      description: String = null,
                      display_name: String = null,
@@ -12,5 +11,4 @@ case class UserOut (
                      type_ :String = null,
                      view_count: Int = 0,
                      email:String = null,
-                     created_at: Timestamp = null
-  )
+                     created_at: LocalDateTime = null)

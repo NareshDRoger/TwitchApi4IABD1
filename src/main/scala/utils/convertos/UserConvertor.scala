@@ -1,9 +1,10 @@
 package utils.convertos
 
-import java.sql.Timestamp
-
 import model.in.UserIn
 import model.out.UserOut
+import utils.convertos.StreamConvertor.dtf
+
+import java.time.LocalDateTime
 
 object UserConvertor extends Converter[UserIn, UserOut]{
 
@@ -19,7 +20,7 @@ object UserConvertor extends Converter[UserIn, UserOut]{
 //      type_ = input.type_,
       view_count = input.view_count,
 //      email = input.email,
-      created_at = new Timestamp(Integer.parseInt(input.created_at))
+      created_at = LocalDateTime.parse(input.created_at, dtf)
     )
 
 

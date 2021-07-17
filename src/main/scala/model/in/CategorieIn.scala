@@ -1,10 +1,9 @@
 package model.in
 
 case class CategorieIn (
-                    box_art_url: String,
-                    name: String,
-                    id: String
-)
+                         id: String,
+                         name: String,
+                         box_art_url: String)
 
 
 

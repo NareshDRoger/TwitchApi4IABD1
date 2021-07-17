@@ -1,9 +1,9 @@
 package model.in
 
 case class GameIn (
-//                        box_art_url: String,
-//                        name: String,
-                        name: String)
+                    box_art_url: String,
+                    id: String,
+                    name: String)
 
 
 

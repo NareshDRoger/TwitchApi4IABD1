@@ -1,5 +1,5 @@
 package model.out
 
-class GameOut {
-
-}
+case class GameOut (
+                     name:String = null,
+                     id: String = null)
