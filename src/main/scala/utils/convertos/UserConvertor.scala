@@ -16,9 +16,9 @@ object UserConvertor extends Converter[UserIn, UserOut]{
       display_name =  input.display_name,
       id = input.id,
       login = input.login,
-      type_ = input.type_,
+//      type_ = input.type_,
       view_count = input.view_count,
-      email = input.email,
+//      email = input.email,
       created_at = new Timestamp(Integer.parseInt(input.created_at))
     )
 

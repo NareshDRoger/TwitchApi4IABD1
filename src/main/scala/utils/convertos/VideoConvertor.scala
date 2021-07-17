@@ -1,30 +1,29 @@
 package utils.convertos
 
-import java.sql.Timestamp
-
 import model.in.VideoIn
 import model.out.VideoOut
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 object VideoConvertor extends Converter[VideoIn, VideoOut]{
 
+  val dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
   override def convert(input: VideoIn): VideoOut = {
 
     VideoOut(
-      //created_at = Timestamp.valueOf(input.created_at),
-      created_at = new Timestamp(Integer.parseInt(input.created_at)),
-      description = input.description,
-      duration = input.duration,
-      id = input.id,
-      language = input.language,
-      //pagination: Object[String],
-      published_at = new Timestamp(Integer.parseInt(input.published_at)),
       title = input.title,
-//      type_ = input.type_,
-      //url : Object,
-      user_id = input.user_id,
+      url = input.url,
       user_login= input.user_login,
       user_name = input.user_name,
+      created_at = LocalDateTime.parse(input.created_at, dtf),
+      published_at = LocalDateTime.parse(input.published_at, dtf),
+      description = input.description,
+      duration = input.duration,
+      language = input.language,
+//      type_ = input.type_,
       view_count = input.view_count,
       viewable = input.viewable
     )

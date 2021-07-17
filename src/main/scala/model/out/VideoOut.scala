@@ -1,25 +1,22 @@
 package model.out
 
-import java.sql.Timestamp
+import java.time.LocalDateTime
+
 
 case class VideoOut(
-
-            created_at:Timestamp = null,
-            description:String = null,
-            duration:String = null,
-            id: String = null,
-            language: String = null,
-            //pagination: Object[String],
-            published_at: Timestamp = null,
-            title : String = null,
-//            type_ : String = null,
-//            url : Object,
-            user_id: String = null,
-            user_login: String = null,
-            user_name:String = null,
-            view_count: Int = 0,
-            viewable: String = null
-
+                     title: String = null,
+                     url : String = null,
+                     user_login: String = null,
+                     user_name: String = null,
+                     created_at:LocalDateTime = null,
+                     published_at:LocalDateTime = null,
+                     description:String = null,
+                     duration:String = null,
+                     language: String = null,
+//                     type_ : String = null,
+                     view_count: Int = 0,
+                     viewable: String = null
             )
+
 
 

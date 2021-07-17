@@ -1,21 +1,23 @@
 package model.in
 
 case class VideoIn(
-                created_at: String,
-                description: String,
-                duration: String,
-                id: String,
-                language: String,
-                //pagination: Object[String],
-                published_at: String,
-                title : String,
-//                type : String,
-//                url : Object,
-                user_id: String,
-                user_login: String,
-                user_name:String,
-                view_count: Int,
-                viewable: String
+                    id: String,
+                    stream_id: String,
+                    user_id: String,
+                    user_login: String,
+                    user_name:String,
+                    title : String,
+                    description: String,
+                    created_at: String,
+                    published_at: String,
+                    url: String,
+                    thumbnail_url: String,
+                    viewable: String,
+                    view_count: Int,
+                    language: String,
+//                    type: String,
+                    duration: String,
+//                    muted_segments: String
                 )
 
 

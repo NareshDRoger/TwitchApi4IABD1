@@ -1,72 +1,143 @@
 package application
-import model.in.{CategorieIn, VideoIn}
+import model.in.{CategorieIn, UserIn, VideoIn}
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
+import utils.convertos.VideoConvertor
+
+import java.time.format.DateTimeFormatter
 
 object ParserJson_BYUS extends App{
 
 
   implicit val formats = DefaultFormats
 
-
-  println("Test for unique element : ")
-
-  val jsOneCategorieIn =
-    """{"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc%20Golf-52x72.jpg", "id": "24960", "name": "Disc Golf"}"""
-
-  val testClassCategorie = parse(jsOneCategorieIn).extract[CategorieIn]
-
-  println(testClassCategorie)
-
-  val jsMultipleCategorieIn =
-    """{"data": [{"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc%20Golf-52x72.jpg", "id": "24960", "name": "Disc Golf"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc%20Creatures-52x72.jpg", "id": "514694", "name": "Disc Creatures"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc%20Golf%20VR-52x72.jpg", "id": "54805687", "name": "Disc Golf VR"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/disc%20party-52x72.jpg", "id": "985051251", "name": "disc party"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc-52x72.jpg", "id": "2610", "name": "Disc"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/DISC%20ROOM-52x72.jpg", "id": "508084", "name": "DISC ROOM"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc%20Golf%20Valley-52x72.jpg", "id": "1742806421", "name": "Disc Golf Valley"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc%20Room-52x72.jpg", "id": "89734404", "name": "Disc Room"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc%20Drivin%27-52x72.jpg", "id": "31093", "name": "Disc Drivin'"}, {"box_art_url": "https://static-cdn.jtvnw.net/ttv-boxart/Disc%20Jam-52x72.jpg", "id": "491413", "name": "Disc Jam"}], "pagination": {"cursor": "MTA="}}"""
-
-  // json is a JValue instance
-  val json = parse(jsMultipleCategorieIn)
-  val elements = (json \\ "data").children
-  println(elements.size + " CategorieIn :")
-  for (acct <- elements) {
-    val m = acct.extract[CategorieIn]
-    println("CategorieIn: " + m)
-  }
-
-  println("Test for unique element : ")
-
-  val jsOneVideoIn =
-    """{"id": "1049993597", "stream_id": "42299574028", "user_id": "41719107", "user_login": "zerator", "user_name": "ZeratoR", "title": "D\u00e9brief #ZLAN2021 ! Quel week-end de fou ! D\u00e9but du mapping ZrT Trackmania Cup le 12 Juin avec des nouveaux blocs !", "description": "", "created_at": "2021-06-08T18:59:25Z", "published_at": "2021-06-08T18:59:25Z", "url": "https://www.twitch.tv/videos/1049993597", "thumbnail_url": "", "viewable": "public", "view_count": 551, "language": "fr", "type": "archive", "duration": "2h22m22s", "muted_segments": null}"""
-
-  val testClassVideoIn = parse(jsOneVideoIn).extract[VideoIn]
-
-  println(testClassVideoIn)
-
-  val jsMultipleVideoIn =
-    """{"data": [{"id": "1049993597", "stream_id": "42299574028", "user_id": "41719107", "user_login": "zerator", "user_name": "ZeratoR", "title": "D\u00e9brief #ZLAN2021 ! Quel week-end de fou ! D\u00e9but du mapping ZrT Trackmania Cup le 12 Juin avec des nouveaux blocs !", "description": "", "created_at": "2021-06-08T18:59:25Z", "published_at": "2021-06-08T18:59:25Z", "url": "https://www.twitch.tv/videos/1049993597", "thumbnail_url": "", "viewable": "public", "view_count": 551, "language": "fr", "type": "archive", "duration": "2h22m22s", "muted_segments": null}, {"id": "1047621005", "stream_id": "42241650589", "user_id": "41719107", "user_login": "zerator", "user_name": "ZeratoR", "title": "#ZLAN 2021 | GROSSE COUPURE INTERNET, ILS SONT DESSUS !", "description": "", "created_at": "2021-06-06T10:47:25Z", "published_at": "2021-06-06T10:47:25Z", "url": "https://www.twitch.tv/videos/1047621005", "thumbnail_url": "https://static-cdn.jtvnw.net/cf_vods/d2nvs31859zcd8/5a62bb66c4a6eace8020_zerator_42241650589_1622976436/thumb/custom-fe82b9ce-2d65-450f-a02d-fe9828f2c537-%{width}x%{height}.jpeg", "viewable": "public", "view_count": 4322075, "language": "fr", "type": "archive", "duration": "12h32m56s", "muted_segments": null}], "pagination": {"cursor": "eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6Mn19"}}"""
-
-  // json is a JValue instance
-  val json2 = parse(jsMultipleVideoIn)
-  val elements2 = (json2 \\ "data").children
-  println(elements2.size + " VideoIn :")
-  for (acct <- elements2) {
-    val m = acct.extract[VideoIn]
-    println("VideoIn: " + m)
-  }
+  val dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   val r = requests.post("https://id.twitch.tv/oauth2/token", data = Map("client_id" -> "29kho0bv7hn49vs4o0moum0f59om64","client_secret"->"5ga0hmwwjr20zgsqiiwqemaaa3dumc","grant_type"->"client_credentials"))
-  print(r.statusCode)
-  print(r.text)
-  val test = requests.get(
-    "https://api.twitch.tv/helix/search/categories?query=disc?&first=10",
-    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> "Bearer ruj1j6u2bjr87eiygrpwpgoc9jk7pl")
+  println(r.statusCode)
+  println(r.text)
+  val bearer = (parse(r.text())\"access_token").extract[String]
+  println(bearer)
+
+  println("CLASSEMENT DES VIDEOS LES PLUS VUES D'UN JEU DONNE")
+
+  print("Entrez le jeu que vous souhaitez explorer : ")
+  val gameNameSelect = scala.io.StdIn.readLine()
+
+  val gameGetRequest = requests.get(
+    "https://api.twitch.tv/helix/search/categories?query=" + gameNameSelect,
+    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> ("Bearer " + bearer))
   )
-  print(test.text)
-  val jsMultipleCategorieIn2 = test.text
+//  println(gameGetRequest.text)
+  val gameGetJson = gameGetRequest.text
 
   // json is a JValue instance
-  val json3 = parse(jsMultipleCategorieIn2)
-  val elements3 = (json \\ "data").children
-  println(elements3.size + " CategorieIn :")
-  for (acct <- elements3) {
-    val m = acct.extract[CategorieIn]
-    println("CategorieIn: " + m)
+  val game = parse(gameGetJson)
+  val gameElement = (game \\ "data").children
+  println(gameElement.size + " categories disponibles.")
+  println("Voici la liste des catégories de 0 à " + (gameElement.size - 1))
+  for (acct <- gameElement) {
+    val g = acct.extract[CategorieIn]
+    println("\t" + g.name)
   }
+
+  print("Entrez le numéro du jeu que vous souhaitez explorer : ")
+  val gameSelect = scala.io.StdIn.readInt()
+  val gameId = gameElement(gameSelect).extract[CategorieIn].id
+  val gameName = gameElement(gameSelect).extract[CategorieIn].name
+  assert(gameId != null)
+  assert(gameName != null)
+  println("Vous avez choisi le jeu : "+ gameName)
+  println("gameId = " + gameId)
+
+  print("Entrez le nombre de videos que vous souhaitez classer : ")
+  val videosNumber = scala.io.StdIn.readInt()
+
+  val videosFromGameGetRequest = requests.get(
+    "https://api.twitch.tv/helix/videos?sort=views&game_id=" + gameId + "&first=" + videosNumber,
+    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> ("Bearer " + bearer))
+  )
+
+  println(videosFromGameGetRequest.text)
+  val videosFromGameGetJson = videosFromGameGetRequest.text
+  // json is a JValue instance
+  val videos = parse(videosFromGameGetJson)
+  val videosElements = (videos \\ "data").children
+  println(videosElements.size + " videos.")
+  println("Voici les " + (videosElements.size) + " vidéos les plues vues du jeu " + gameName)
+
+  var cpt = 1
+  for (acct <- videosElements) {
+    val vIn = acct.extract[VideoIn]
+    val vOut = VideoConvertor.convert(vIn)
+    println("\tVideo " + cpt)
+    println("\t\t" + "Titre = " + vOut.title)
+    println("\t\tUrl = " + vOut.url)
+    println("\t\tPublié le " + vOut.published_at.toLocalDate.format(dtf) + " à " + vOut.published_at.toLocalTime)
+    println("\t\tPublié par = " + vOut.user_login)
+    println("\t\tNombre de vus = " + vOut.view_count)
+    println("\t\tDurée = " + vOut.duration)
+    cpt += 1
+  }
+
+
+  println("CLASSEMENT DES VIDEOS LES PLUS VUES D'UN JEU DONNE")
+
+    print("Entrez l'utilisateur que vous souhaitez explorer : ")
+    val userNameSelect = scala.io.StdIn.readLine()
+
+  val userGetRequest = requests.get(
+    "https://api.twitch.tv/helix/users?login=" + userNameSelect,
+    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> ("Bearer " + bearer))
+  )
+//  println(userGetRequest.text)
+  val userGetJson = userGetRequest.text
+
+  // json is a JValue instance
+  val user = parse(userGetJson)
+  val userElement = (user \\ "data").children
+  println(userElement.size + " utilisateur(s) disponible(s).")
+  println("Voici la liste des utilisateurs de 0 à " + (userElement.size - 1))
+  for (acct <- userElement) {
+    val u = acct.extract[UserIn]
+    println("\t" + u.login)
+  }
+
+  val userId = userElement(0).extract[UserIn].id
+  val userDisplayName = userElement(0).extract[UserIn].display_name
+  assert(userId != null)
+  assert(userDisplayName != null)
+  println("Vous avez choisi l'utilisateur : " + userDisplayName)
+  println("userId = " + userId)
+
+  print("Entrez le nombre de videos que vous souhaitez classer : ")
+  val videosByUserNumber = scala.io.StdIn.readInt()
+
+  val videosFromUserGetRequest = requests.get(
+    "https://api.twitch.tv/helix/videos?sort=views&user_id=" + userId + "&first=" + videosByUserNumber,
+    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> ("Bearer " + bearer))
+  )
+
+  println(videosFromUserGetRequest.text)
+  val videosFromUserGetJson = videosFromUserGetRequest.text
+  // json is a JValue instance
+  val videosByUser = parse(videosFromUserGetJson)
+  val videosByUserElements = (videosByUser \\ "data").children
+  println(videosByUserElements.size + " videos.")
+  println("Voici les " + (videosByUserElements.size) + " vidéos les plues vues de l'utilisateur " + userDisplayName)
+
+  var cpt2 = 1
+  for (acct <- videosByUserElements) {
+    val vIn = acct.extract[VideoIn]
+    val vOut = VideoConvertor.convert(vIn)
+    println("\tVideo " + cpt2)
+    println("\t\t" + "Titre = " + vOut.title)
+    println("\t\tUrl = " + vOut.url)
+    println("\t\tPublié le " + vOut.published_at.toLocalDate.format(dtf) + " à " + vOut.published_at.toLocalTime)
+    println("\t\tPublié par = " + vOut.user_login)
+    println("\t\tNombre de vus = " + vOut.view_count)
+    println("\t\tDurée = " + vOut.duration)
+    cpt2 += 1
+  }
+
 }
