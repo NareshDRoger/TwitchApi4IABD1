@@ -1,10 +1,13 @@
 package application
+import jp.co.bizreach.elasticsearch4s.{ESClient, ESConfig}
 import model.in.{CategorieIn, StreamIn, UserIn, VideoIn}
+import model.out.{StreamOut, VideoOut}
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import utils.convertos.{StreamConvertor, VideoConvertor}
 
 import java.time.format.DateTimeFormatter
+import scala.collection.mutable.ListBuffer
 
 object Main extends App{
 
@@ -12,6 +15,10 @@ object Main extends App{
   implicit val formats = DefaultFormats
 
   val dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+  var endpoint1List = new ListBuffer[VideoOut]()
+  var endpoint2List = new ListBuffer[VideoOut]()
+  var endpoint3List = new ListBuffer[StreamOut]()
 
   val r = requests.post("https://id.twitch.tv/oauth2/token", data = Map("client_id" -> "29kho0bv7hn49vs4o0moum0f59om64","client_secret"->"5ga0hmwwjr20zgsqiiwqemaaa3dumc","grant_type"->"client_credentials"))
   println(r.statusCode)
@@ -72,6 +79,7 @@ object Main extends App{
   for (acct <- videosElements) {
     val vIn = acct.extract[VideoIn]
     val vOut = VideoConvertor.convert(vIn)
+    endpoint1List += vOut
     println("\tVideo " + cpt)
     println("\t\t" + "Titre = " + vOut.title)
     println("\t\tUrl = " + vOut.url)
@@ -132,6 +140,7 @@ object Main extends App{
   for (acct <- videosByUserElements) {
     val vIn = acct.extract[VideoIn]
     val vOut = VideoConvertor.convert(vIn)
+    endpoint2List += vOut
     println("\tVideo " + cpt2)
     println("\t\t" + "Titre = " + vOut.title)
     println("\t\tUrl = " + vOut.url)
@@ -196,6 +205,7 @@ object Main extends App{
   for (acct <- streamsElements) {
     val sIn = acct.extract[StreamIn]
     val sOut = StreamConvertor.convert(sIn)
+    endpoint3List += sOut
     println("\tVideo " + cpt3)
     println("\t\tTitre = " + sOut.title)
     println("\t\tLien du stream = https://www.twitch.tv/" + sOut.user_name)
@@ -204,6 +214,29 @@ object Main extends App{
     println("\t\tNombre de vues = " + sOut.view_count)
     println("\t\tLangue = " + sOut.language)
     cpt3 += 1
+  }
+
+  ESClient.using("http://localhost:9200") { client =>
+    val endpoint1 = ESConfig("endpoint_1")
+
+    //     Insert in "endpoint_1" index
+    for (vOut <- endpoint1List.toList) {
+      client.insert(endpoint1, vOut)
+    }
+
+    val endpoint2 = ESConfig("endpoint_2")
+
+    //     Insert in "endpoint_2" index
+    for (vOut <- endpoint2List.toList) {
+      client.insert(endpoint2, vOut)
+    }
+
+    val endpoint3 = ESConfig("endpoint_3")
+
+    //     Insert in "endpoint_3" index
+    for (sOut <- endpoint3List.toList) {
+      client.insert(endpoint3, sOut)
+    }
   }
 
 }
