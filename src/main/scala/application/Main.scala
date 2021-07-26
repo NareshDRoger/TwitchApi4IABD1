@@ -20,11 +20,11 @@ object Main extends App{
   var endpoint2List = new ListBuffer[VideoOut]()
   var endpoint3List = new ListBuffer[StreamOut]()
 
-  val r = requests.post("https://id.twitch.tv/oauth2/token", data = Map("client_id" -> "29kho0bv7hn49vs4o0moum0f59om64","client_secret"->"5ga0hmwwjr20zgsqiiwqemaaa3dumc","grant_type"->"client_credentials"))
+  val r = requests.post("https://id.twitch.tv/oauth2/token", data = Map("client_id" -> ApplicationConfiguration.clientId, "client_secret" -> ApplicationConfiguration.clientSecret, "grant_type" -> ApplicationConfiguration.grantType))
   println(r.statusCode)
-  println(r.text)
+//  println(r.text)
   val bearer = (parse(r.text())\"access_token").extract[String]
-  println(bearer)
+//  println(bearer)
 
   println("CLASSEMENT DES VIDEOS LES PLUS VUES D'UN JEU DONNE")
 
@@ -33,7 +33,7 @@ object Main extends App{
 
   val gameGetRequest = requests.get(
     "https://api.twitch.tv/helix/search/categories?query=" + gameNameSelect,
-    headers = Map("Client-ID" -> "29kho0bv7hn49vs4o0moum0f59om64","Authorization" -> ("Bearer " + bearer))
+    headers = Map("Client-ID" -> ApplicationConfiguration.clientId, "Authorization" -> ("Bearer " + bearer))
   )
 //  println(gameGetRequest.text)
   val gameGetJson = gameGetRequest.text
